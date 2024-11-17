@@ -1,100 +1,105 @@
 class Node:
-    """Класс для узла дерева"""
     def __init__(self, key):
         self.key = key
         self.left = None
         self.right = None
 
+
 class BinarySearchTree:
-    """Класс для бинарного дерева поиска"""
     def __init__(self):
         self.root = None
 
+    # Вставка элемента в дерево
     def insert(self, key):
-        """Вставка элемента в дерево"""
         if self.root is None:
             self.root = Node(key)
         else:
             self._insert(self.root, key)
 
-    def _insert(self, current, key):
-        if key < current.key:
-            if current.left is None:
-                current.left = Node(key)
+    def _insert(self, current_node, key):
+        if key < current_node.key:
+            if current_node.left is None:
+                current_node.left = Node(key)
             else:
-                self._insert(current.left, key)
-        elif key > current.key:
-            if current.right is None:
-                current.right = Node(key)
+                self._insert(current_node.left, key)
+        elif key > current_node.key:
+            if current_node.right is None:
+                current_node.right = Node(key)
             else:
-                self._insert(current.right, key)
+                self._insert(current_node.right, key)
 
+    # Поиск элемента в дереве
     def search(self, key):
-        """Поиск элемента в дереве"""
         return self._search(self.root, key)
 
-    def _search(self, current, key):
-        if current is None or current.key == key:
-            return current
-        if key < current.key:
-            return self._search(current.left, key)
-        else:
-            return self._search(current.right, key)
+    def _search(self, current_node, key):
+        if current_node is None or current_node.key == key:
+            return current_node
+        if key < current_node.key:
+            return self._search(current_node.left, key)
+        return self._search(current_node.right, key)
 
+    # Удаление элемента из дерева
     def delete(self, key):
-        """Удаление элемента из дерева"""
         self.root = self._delete(self.root, key)
 
-    def _delete(self, current, key):
-        if current is None:
-            return current
-        if key < current.key:
-            current.left = self._delete(current.left, key)
-        elif key > current.key:
-            current.right = self._delete(current.right, key)
+    def _delete(self, node, key):
+        if node is None:
+            return node
+        if key < node.key:
+            node.left = self._delete(node.left, key)
+        elif key > node.key:
+            node.right = self._delete(node.right, key)
         else:
-            # Узел с одним или без потомков
-            if current.left is None:
-                return current.right
-            elif current.right is None:
-                return current.left
+            # Узел найден, нужно удалить
+            if node.left is None:
+                return node.right
+            elif node.right is None:
+                return node.left
+            # Узел с двумя потомками: получить преемника
+            temp = self._min_value_node(node.right)
+            node.key = temp.key
+            node.right = self._delete(node.right, temp.key)
+        return node
 
-            # Узел с двумя потомками
-            min_larger_node = self._find_min(current.right)
-            current.key = min_larger_node.key
-            current.right = self._delete(current.right, min_larger_node.key)
-        return current
-
-    def _find_min(self, current):
+    def _min_value_node(self, node):
+        current = node
         while current.left is not None:
             current = current.left
         return current
 
+    # Симметричный обход дерева (в порядке возрастания)
     def inorder(self):
-        """Симметричный обход дерева"""
         result = []
         self._inorder(self.root, result)
         return result
 
-    def _inorder(self, current, result):
-        if current is not None:
-            self._inorder(current.left, result)
-            result.append(current.key)
-            self._inorder(current.right, result)
+    def _inorder(self, node, result):
+        if node:
+            self._inorder(node.left, result)
+            result.append(node.key)
+            self._inorder(node.right, result)
 
-# Пример использования
+
+# Пример использования дерева
 if __name__ == "__main__":
+    # Создаем дерево поиска
     bst = BinarySearchTree()
+    
+    # Вставляем элементы
+    bst.insert(20)
     bst.insert(10)
+    bst.insert(30)
     bst.insert(5)
     bst.insert(15)
-    bst.insert(3)
-    bst.insert(7)
-
-    print("Симметричный обход дерева:", bst.inorder())
-
-    print("Поиск 7:", "Найдено" if bst.search(7) else "Не найдено")
-    print("Поиск 20:", "Найдено" if bst.search(20) else "Не найдено")
-
+    
+    # Печатаем отсортированные элементы (симметричный обход)
+    print("Inorder traversal:", bst.inorder())
+    
+    # Ищем элементы
+    print("Search for 15:", bst.search(15) is not None)
+    print("Search for 40:", bst.search(40) is not None)
+    
+    # Удаляем элемент
     bst.delete(10)
-    print("Симметричный обход после удаления 10:", bst.inorder())
+    print("Inorder traversal after deleting 10:", bst.inorder())
