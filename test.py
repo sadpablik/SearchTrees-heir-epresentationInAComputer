@@ -1,4 +1,6 @@
 import unittest
+from main import BinarySearchTree
+# для запуска теста python -m unittest test
 
 class TestBinarySearchTree(unittest.TestCase):
     
